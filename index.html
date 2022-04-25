@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+<div id="app">
+</div>
+<script id="app-template" type="text/x-template">
+  <v-app>
+    <v-container fluid>
+      <div class="d-flex justify-center">
+        <v-card outlined width="642px" class="ma-2">
+          <div class="vid" style="width:640px; height:360px">
+            <div class="vid-inner" v-show="first.service=='twitch'">
+              <div id="first-twitch"></div>
+            </div>
+            <div class="vid-inner" v-show="first.service=='youtube'">
+              <div id="first-youtube"></div>
+            </div>
+          </div>
+          <div class="d-flex align-center">
+            <v-btn-toggle class="ma-2" v-model="first.service" @change="updateService('first')">
+              <v-btn outlined value="twitch">Twitch</v-btn>
+              <v-btn outlined value="youtube">Youtube</v-btn>
+            </v-btn-toggle>
+            <v-text-field outlined label="Video Id" type="text" v-model="first.id" hide-details="auto" dense @change="updateId('first')" class="mr-2"/>
+            <v-text-field outlined label="Delay (seconds)" type="number" v-model="first.time" hide-details="auto" dense class="mr-2"/>
+            <v-btn outlined @click="setDelay('first')" class="mr-2">
+              Set Delay to<br/>Current Time
+            </v-btn>
+          </div>
+        </v-card>
+        <v-card outlined width="642px" class="ma-2">
+          <div class="vid" style="width:640; height:360;">
+            <div class="vid-inner" v-show="second.service=='twitch'">
+              <div id="second-twitch"></div>
+            </div>
+            <div class="vid-inner" v-show="second.service=='youtube'">
+              <div id="second-youtube"></div>
+            </div>
+          </div>
+          <div class="d-flex align-center">
+            <v-btn-toggle class="ma-2" v-model="second.service" @change="updateService('second')">
+              <v-btn outlined value="twitch">Twitch</v-btn>
+              <v-btn outlined value="youtube">Youtube</v-btn>
+            </v-btn-toggle>
+            <v-text-field outlined label="Video Id" type="text" v-model="second.id" hide-details="auto" dense @change="updateId('second')" class="mr-2"/>
+            <v-text-field outlined label="Delay (seconds)" type="number" v-model="second.time" hide-details="auto" dense class="mr-2"/>
+            <v-btn outlined @click="setDelay('second')" class="mr-2">
+              Set Delay to<br/>Current Time
+            </v-btn>
+          </div>
+        </v-card>
+      </div>
+      <v-card flat>
+        <v-card-actions class="d-flex justify-center">
+          <v-btn outlined large @click="reset">
+            <div class="d-flex flex-column"><v-icon>mdi-skip-previous</v-icon><span>restart</span></div>
+          </v-btn>
+          <v-btn outlined large @click="step(-60)">
+            <div class="d-flex flex-column"><v-icon>mdi-step-backward-2</v-icon><span>back (1m)</span></div>
+          </v-btn>
+          <v-btn outlined large @click="step(-10)">
+            <div class="d-flex flex-column"><v-icon>mdi-step-backward</v-icon><span>back (10s)</span></div>
+          </v-btn>
+          <v-btn outlined large @click="play">
+            <div class="d-flex flex-column"><v-icon>mdi-play</v-icon><span>play</span></div>
+          </v-btn>
+          <v-btn outlined large @click="pause">
+            <div class="d-flex flex-column"><v-icon>mdi-pause</v-icon><span>pause</span></div>
+          </v-btn>
+          <v-btn outlined large @click="step(10)">
+            <div class="d-flex flex-column"><v-icon>mdi-step-forward</v-icon><span>forward (10s)</span></div>
+          </v-btn>
+          <v-btn outlined large @click="step(60)">
+            <div class="d-flex flex-column"><v-icon>mdi-step-forward-2</v-icon><span>forward (1m)</span></div>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-container>
+  </v-app>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+<script src="https://player.twitch.tv/js/embed/v1.js"></script>
+<script>
+  // get youtube api
+  let youtubeReady = false
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  function onYouTubeIframeAPIReady() {
+    youtubeReady = true
+  }
+  const App = {
+    template: '#app-template',
+    data: () => ({
+      first: {
+        service: 'twitch',
+        id: '1461721066',
+        time: 1,
+        twitch: null,
+        youtube: null
+      },
+      second: {
+        service: 'youtube',
+        id: 'nMZfKXk8geo',
+        time: 26,
+        twitch: null,
+        youtube: null
+      }
+    }),
+    computed: {
+      isPlaying () {
+        let firstPlaying = false
+        let secondPlaying = false
+        try{
+          if(this.first.service == 'twitch')
+            firstPlaying = !this.first.twitch.isPaused()
+          if(this.first.service == 'youtube')
+            firstPlaying = this.first.youtube.getPlayerState() == 1
+          if(this.second.service == 'twitch')
+            secondPlaying = !this.second.twitch.isPaused()
+          if(this.second.service == 'youtube')
+            secondPlaying = this.second.youtube.getPlayerState() == 1
+        } catch(err) {
+        }
+        return firstPlaying || secondPlaying
+      },
+      both() {
+        return [this.first, this.second]
+      }
+    },
+    methods: {
+      play() {
+        this.both.forEach(it => {
+          if(it.service == 'twitch')
+            it.twitch.play()
+          if(it.service == 'youtube')
+            it.youtube.playVideo()
+        })
+      },
+      pause() {
+        this.both.forEach(it => {
+          it.twitch.pause()
+          it.youtube.pauseVideo()
+        })
+      },
+      playPause () {
+        if(this.isPlaying)
+          this.pause()
+        else
+          this.play()
+      },
+      reset(n) {
+        // todo reset for just n
+        this.both.forEach(it => {
+          if(it.service == 'twitch')
+            it.twitch.seek(it.time)
+          if(it.service == 'youtube')
+            it.youtube.seekTo(it.time, true)
+        })
+      },
+      step(seconds) {
+        this.both.forEach(it => {
+          if(it.service == 'twitch')
+            it.twitch.seek(it.twitch.getCurrentTime() + seconds)
+          if(it.service == 'youtube')
+            it.youtube.seekTo(it.youtube.getCurrentTime() + seconds, true)
+        })
+      },
+      setDelay(n){
+        if(this[n].service == 'twitch')
+          this[n].time = this[n].twitch.getCurrentTime()
+        if(this[n].service == 'youtube')
+          this[n].time = this[n].youtube.getCurrentTime()
+      },
+      updateId(n){
+        if(this[n].service == 'twitch')
+          this[n].twitch.setVideo(this[n].id, this[n].time)
+        if(this[n].service == 'youtube'){
+          this[n].youtube.loadVideoById(this[n].id, this[n].time)
+          this[n].youtube.pauseVideo()
+        }
+      },
+      updateService(n){
+        this.pause()
+        this.updateId(n)
+        this.reset(n)
+      },
+      init(){
+        let firstTwitch = new Twitch.Player("first-twitch", {
+          video: this.first.id,
+          time: this.first.time,
+          parent: ["localhost"],
+          width: 640,
+          height: 360,
+          autoplay: false
+        })
+        this.first.twitch = firstTwitch.getPlayer()
+        let secondTwitch = new Twitch.Player("second-twitch", {
+          video: this.second.id,
+          time: this.second.time,
+          parent: ["localhost"],
+          width: 640,
+          height: 360,
+          autoplay: false
+        })
+        this.second.twitch = secondTwitch.getPlayer()
+        this.first.youtube = new YT.Player('first-youtube', {
+          videoId: this.first.id,
+          playerVars: {
+            playsinline: 1,
+            start: this.first.time
+          },
+          width: '640',
+          height: '360'
+        })
+        this.second.youtube = new YT.Player('second-youtube', {
+          videoId: this.second.id,
+          playerVars: {
+            playsinline: 1,
+            start: this.second.time
+          },
+          width: '640',
+          height: '360'
+        })
+      },
+      checkReady() {
+        if(youtubeReady == false)
+          setTimeout(this.checkReady, 1000)
+        else
+          this.init()
+      }
+    },
+    mounted () {
+      this.checkReady()
+    }
+  }
+
+  new Vue({
+    render: h => h(App),
+    vuetify: new Vuetify(),
+  }).$mount('#app')
+</script>
+</body>
+</html>
