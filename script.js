@@ -66,7 +66,7 @@ const App = {
     shareUrl() {
       let first = `service1=${this.first.service}&id1=${this.first.id}&time1=${this.first.time}`
       let second = `service2=${this.second.service}&id2=${this.second.id}&time2=${this.second.time}`
-      return `${this.$route.path}?${first}&${second}`
+      return `https://synced-video-playback.herokuapp.com${this.$route.path}?${first}&${second}`
     }
   },
   watch: {
