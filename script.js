@@ -177,7 +177,8 @@ const App = {
         parent: ["localhost"],
         width: '100%',
         height: '100%',
-        autoplay: false
+        autoplay: false,
+        muted: true
       })
       this.first.twitch = firstTwitch.getPlayer()
       let secondTwitch = new Twitch.Player("second-twitch", {
@@ -186,7 +187,8 @@ const App = {
         parent: ["localhost"],
         width: '100%',
         height: '100%',
-        autoplay: false
+        autoplay: false,
+        muted: true
       })
       this.second.twitch = secondTwitch.getPlayer()
       this.first.youtube = new YT.Player('first-youtube', {
