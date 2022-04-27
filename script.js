@@ -164,12 +164,12 @@ const App = {
       if(this.first.id == undefined){
         this.first.service = 'twitch',
         this.first.id = '1461721066',
-        this.first.time = 1
+        this.first.time = .715
       }
       if(this.second.id == undefined){
         this.second.service = 'youtube',
         this.second.id = 'nMZfKXk8geo',
-        this.second.time = 26
+        this.second.time = 25.75
       }
       let firstTwitch = new Twitch.Player("first-twitch", {
         video: this.first.id,
