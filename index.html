@@ -26,17 +26,22 @@
           </div>
           <div class="d-flex align-center">
             <v-btn-toggle class="ma-2" v-model="first.service" @change="updateService('first')" dense>
-              <v-btn outlined value="twitch">
+              <v-btn outlined value="twitch" height="40">
                 <v-icon>mdi-twitch</v-icon>
               </v-btn>
-              <v-btn outlined value="youtube">
+              <v-btn outlined value="youtube" height="40">
                 <v-icon>mdi-youtube</v-icon>
               </v-btn>
             </v-btn-toggle>
             <v-text-field outlined label="Video Id" type="text" v-model="first.id" hide-details="auto" dense @change="updateId('first')" class="mr-2"/>
             <v-text-field outlined label="Delay (seconds)" type="number" v-model="first.time" hide-details="auto" dense class="mr-2"/>
-            <v-btn outlined @click="setDelay('first')" class="mr-2">
-              Set Delay to<br/>Current Time
+            <v-btn outlined @click="setDelay('first')" class="mr-2 px-0" height="40">
+              <div v-if="isMobile">
+                Set<br/>Delay
+              </div>
+              <div v-else class="mx-2">
+                Set Delay to<br/>Current Time
+              </div>
             </v-btn>
           </div>
         </v-card>
@@ -51,17 +56,22 @@
           </div>
           <div class="d-flex align-center">
             <v-btn-toggle class="ma-2" v-model="second.service" @change="updateService('second')" dense>
-              <v-btn outlined value="twitch">
+              <v-btn outlined value="twitch" height="40">
                 <v-icon>mdi-twitch</v-icon>
               </v-btn>
-              <v-btn outlined value="youtube">
+              <v-btn outlined value="youtube" height="40">
                 <v-icon>mdi-youtube</v-icon>
               </v-btn>
             </v-btn-toggle>
             <v-text-field outlined label="Video Id" type="text" v-model="second.id" hide-details="auto" dense @change="updateId('second')" class="mr-2"/>
             <v-text-field outlined label="Delay (seconds)" type="number" v-model="second.time" hide-details="auto" dense class="mr-2"/>
-            <v-btn outlined @click="setDelay('second')" class="mr-2">
-              Set Delay to<br/>Current Time
+            <v-btn outlined @click="setDelay('second')" class="mr-2 px-0" height="40">
+              <div v-if="isMobile">
+                Set<br/>Delay
+              </div>
+              <div v-else class="mx-2">
+                Set Delay to<br/>Current Time
+              </div>
             </v-btn>
           </div>
         </v-card>
