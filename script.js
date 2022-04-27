@@ -174,21 +174,19 @@ const App = {
       let firstTwitch = new Twitch.Player("first-twitch", {
         video: this.first.id,
         time: this.first.time,
-        parent: ["localhost"],
+        parent: ["synced-video-playback.herokuapp.com"],
         width: '100%',
         height: '100%',
         autoplay: false,
-        muted: true
       })
       this.first.twitch = firstTwitch.getPlayer()
       let secondTwitch = new Twitch.Player("second-twitch", {
         video: this.second.id,
         time: this.second.time,
-        parent: ["localhost"],
+        parent: ["synced-video-playback.herokuapp.com"],
         width: '100%',
         height: '100%',
         autoplay: false,
-        muted: true
       })
       this.second.twitch = secondTwitch.getPlayer()
       this.first.youtube = new YT.Player('first-youtube', {
