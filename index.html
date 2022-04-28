@@ -35,13 +35,13 @@
               </v-btn>
             </v-btn-toggle>
             <v-text-field v-if="!isMobile" outlined label="Video Id" type="text" v-model="first.id" hide-details="auto" dense @change="updateId('first')" class="mr-2"/>
-            <v-text-field outlined label="Delay (seconds)" type="number" v-model="first.time" hide-details="auto" dense class="mr-2"/>
-            <v-btn outlined @click="setDelay('first')" class="mr-2 px-0" height="40">
+            <v-text-field outlined label="Offset (seconds)" type="number" v-model="first.time" hide-details="auto" dense class="mr-2"/>
+            <v-btn outlined @click="setOffset('first')" class="mr-2 px-0" height="40">
               <div v-if="isMobile">
-                Set<br/>Delay
+                Set<br/>Offset
               </div>
               <div v-else class="mx-2">
-                Set Delay to<br/>Current Time
+                Set Offset to<br/>Current Time
               </div>
             </v-btn>
           </div>
@@ -66,13 +66,13 @@
               </v-btn>
             </v-btn-toggle>
             <v-text-field v-if="!isMobile" outlined label="Video Id" type="text" v-model="second.id" hide-details="auto" dense @change="updateId('second')" class="mr-2"/>
-            <v-text-field outlined label="Delay (seconds)" type="number" v-model="second.time" hide-details="auto" dense class="mr-2"/>
-            <v-btn outlined @click="setDelay('second')" class="mr-2 px-0" height="40">
+            <v-text-field outlined label="Offset (seconds)" type="number" v-model="second.time" hide-details="auto" dense class="mr-2"/>
+            <v-btn outlined @click="setOffset('second')" class="mr-2 px-0" height="40">
               <div v-if="isMobile">
-                Set<br/>Delay
+                Set<br/>Offset
               </div>
               <div v-else class="mx-2">
-                Set Delay to<br/>Current Time
+                Set Offset to<br/>Current Time
               </div>
             </v-btn>
           </div>
@@ -118,16 +118,25 @@
         <v-card-text>
           <ul>
             <li>Some videos take a while to get started on first play. Just start playback and then hit <strong>RESTART</strong> to get it synced.</li>
-            <li>Sometimes skipping will desync your videos. To avoid, pause before skipping and play again after both videos are ready. I could probably do this automatically with a little more effort but I haven't yet.</li>
-            <li>Try seeking through videos individually and using <strong>SET DELAY<span v-if="!isMobile"> TO CURRENT TIME</span></strong>, and then <strong>RESTART</strong> to play in sync from there.</li>
+            <li>Try seeking through videos individually and using <strong>SET OFFSET<span v-if="!isMobile"> TO CURRENT TIME</span></strong>, and then <strong>RESTART</strong> to play in sync from there.</li>
           </ul>
         </v-card-text>
       </v-card>
       <div class="d-flex justify-center">
-        <v-icon>mdi-email</v-icon>
-        <span>alnordst</span>
-        <v-icon>mdi-at</v-icon>
-        <span>hey.com</span>
+        <div>
+          <div class="d-flex">
+            <v-icon>mdi-email</v-icon>
+            <span>alnordst</span>
+            <v-icon>mdi-at</v-icon>
+            <span>hey.com</span>
+          </div>
+          <div class="d-flex">
+            <v-icon>mdi-discord</v-icon>
+            <span>threeandthree</span>
+            <v-icon>mdi-pound</v-icon>
+            <span>0123</span>
+          </div>
+        </div>
       </div>
     </v-container>
   </v-app>
