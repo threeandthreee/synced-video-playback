@@ -154,9 +154,9 @@ const App = {
       if('id2' in query)
         this.second.id = query.id2
       if('time1' in query)
-        this.first.time = parseInt(query.time1)
+        this.first.time = parseFloat(query.time1)
       if('time2' in query)
-        this.second.time = parseInt(query.time2)
+        this.second.time = parseFloat(query.time2)
       console.log(this.second)
     },
     init(){
