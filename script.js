@@ -112,7 +112,6 @@ const App = {
       })
     },
     step(seconds) {
-      this.pause()
       this.both.forEach(it => {
         if(it.service == 'twitch')
           it.twitch.seek(it.twitch.getCurrentTime() + seconds)
@@ -120,7 +119,7 @@ const App = {
           it.youtube.seekTo(it.youtube.getCurrentTime() + seconds, true)
       })
     },
-    setOffset(n){
+    setDelay(n){
       if(this[n].service == 'twitch')
         this[n].time = this[n].twitch.getCurrentTime()
       if(this[n].service == 'youtube')
