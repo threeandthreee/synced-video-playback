@@ -66,7 +66,7 @@ const App = {
     shareUrl() {
       let first = `service1=${this.first.service}&id1=${this.first.id}&time1=${this.first.time}`
       let second = `service2=${this.second.service}&id2=${this.second.id}&time2=${this.second.time}`
-      return `https://vod-sync.onrender.com${this.$route.path}?${first}&${second}`
+      return `https://${window.location.hostname}${this.$route.path}?${first}&${second}`
     }
   },
   watch: {
@@ -174,7 +174,7 @@ const App = {
       let firstTwitch = new Twitch.Player("first-twitch", {
         video: this.first.id,
         time: this.first.time,
-        parent: ["vod-sync.onrender.com"],
+        parent: [window.location.hostname],
         width: '100%',
         height: '100%',
         autoplay: false,
@@ -183,7 +183,7 @@ const App = {
       let secondTwitch = new Twitch.Player("second-twitch", {
         video: this.second.id,
         time: this.second.time,
-        parent: ["vod-sync.onrender.com"],
+        parent: [window.location.hostname],
         width: '100%',
         height: '100%',
         autoplay: false,
