@@ -106,17 +106,17 @@ const App = {
       // todo reset for just n
       this.both.forEach(it => {
         if(it.service == 'twitch')
-          it.twitch.seek(it.time)
+          it.twitch.seek(parseFloat(it.time))
         if(it.service == 'youtube')
-          it.youtube.seekTo(it.time, true)
+          it.youtube.seekTo(parseFloat(it.time, true))
       })
     },
     step(seconds) {
       this.both.forEach(it => {
         if(it.service == 'twitch')
-          it.twitch.seek(parseDouble(it.twitch.getCurrentTime()) + seconds)
+          it.twitch.seek(parseFloat(it.twitch.getCurrentTime()) + seconds)
         if(it.service == 'youtube')
-          it.youtube.seekTo(parseDouble(it.youtube.getCurrentTime()) + seconds, true)
+          it.youtube.seekTo(parseFloat(it.youtube.getCurrentTime()) + seconds, true)
       })
     },
     setDelay(n){
@@ -127,9 +127,9 @@ const App = {
     },
     updateId(n){
       if(this[n].service == 'twitch')
-        this[n].twitch.setVideo(this[n].id, this[n].time)
+        this[n].twitch.setVideo(this[n].id, parseFloat(this[n].time))
       if(this[n].service == 'youtube'){
-        this[n].youtube.loadVideoById(this[n].id, this[n].time)
+        this[n].youtube.loadVideoById(this[n].id, parseFloat(this[n].time))
         this[n].youtube.pauseVideo()
       }
     },
