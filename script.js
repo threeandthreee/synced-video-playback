@@ -23,7 +23,19 @@ const App = {
       time: 0,
       twitch: null,
       youtube: null
-    }
+    },
+    breadcrumbs: [
+      {
+        text: '3and3.dev',
+        disabled: false,
+        href: "https://3and3.dev"
+      },
+      {
+        text: 'vod sync',
+        disabled: true,
+        href: "https://vod-sync.3and3.dev"
+      }
+    ]
   }),
   computed: {
     isPlaying () {

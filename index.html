@@ -6,7 +6,7 @@
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-  <title>Synced Video Playback</title>
+  <title>Vod Sync</title>
 </head>
 <body>
 <div id="app">
@@ -14,6 +14,11 @@
 <script id="app-template" type="text/x-template">
   <v-app>
     <v-container fluid>
+      <v-breadcrumbs :items="breadcrumbs">
+        <template v-slot:divider>
+          <v-icon>mdi-chevron-right</v-icon>
+        </template>
+      </v-breadcrumbs>
       <div :class="`d-flex justify-center ${isMobile ? 'flex-column' : 'flex-row'}`">
         <v-card outlined :width="vidWidth + 2" class="ma-2">
           <div class="vid" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
