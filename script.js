@@ -191,7 +191,9 @@ const App = {
         height: '100%',
         autoplay: false,
       })
-      this.first.twitch = firstTwitch.getPlayer()
+      firstTwitch.addEventListener(Twitch.Embed.VIDEO_READY, () => {
+        this.first.twitch = firstTwitch.getPlayer()
+      })
       let secondTwitch = new Twitch.Player("second-twitch", {
         video: this.second.id,
         time: this.second.time,
@@ -200,7 +202,9 @@ const App = {
         height: '100%',
         autoplay: false,
       })
-      this.second.twitch = secondTwitch.getPlayer()
+      secondTwitch.addEventListener(Twitch.Embed.VIDEO_READY, () => {
+        this.second.twitch = secondTwitch.getPlayer()
+      })
       this.first.youtube = new YT.Player('first-youtube', {
         videoId: this.first.id,
         playerVars: {
