@@ -104,8 +104,10 @@ const App = {
     },
     pause() {
       this.both.forEach(it => {
-        it.twitch.pause()
-        it.youtube.pauseVideo()
+        if(it.service == 'twitch')
+          it.twitch.pause()
+        if(it.service == 'youtube')
+          it.youtube.pauseVideo()
       })
     },
     playPause () {
