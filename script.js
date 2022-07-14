@@ -186,7 +186,7 @@ const App = {
       let firstTwitch = new Twitch.Player("first-twitch", {
         video: this.first.id,
         time: this.first.time,
-        parent: ['vod-sync.3and3.dev'],
+        parent: ['vod-sync.3and3.dev', 'vod-sync.onrender.com'],
         width: '100%',
         height: '100%',
         autoplay: false,
@@ -195,7 +195,7 @@ const App = {
       let secondTwitch = new Twitch.Player("second-twitch", {
         video: this.second.id,
         time: this.second.time,
-        parent: ['vod-sync.3and3.dev'],
+        parent: ['vod-sync.3and3.dev', 'vod-sync.onrender.com'],
         width: '100%',
         height: '100%',
         autoplay: false,
