@@ -119,7 +119,7 @@ const App = {
       if(!it.url)
         it.url = it.placeholder
       let twitchMatch = it.url.match(/twitch\.tv.*?(\d+)/)
-      let youtubeMatch = it.url.match(/youtu.*?be.*?(\w{11})/)
+      let youtubeMatch = it.url.match(/youtu\.*?be.*?(\w{11})/)
       if(twitchMatch) {
         it.service = 'twitch'
         it.id = twitchMatch[1]
