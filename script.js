@@ -165,7 +165,6 @@ const App = {
         this.first.seek(this.first.time + secondDiff)
     },
     step(seconds) {
-      console.log('stepping', seconds)
       this.both.forEach(it => {it.seek(it.getCurrentTime() + seconds)})
     },
     copyShareUrl(){
@@ -175,14 +174,14 @@ const App = {
   },
   mounted () {
     let q = this.$route.query
-    let valid = ['s1', 's1', 'i1', 'i2'].every(it => it in q)
+    let valid = ['s1', 's2', 'i1', 'i2'].every(it => it in q)
 
     if(valid) {
       let services = { t: 'twitch', y: 'youtube' }
       this.both.forEach((it, index) => {
         it.service = services[q[`s${index+1}`]]
         it.id = q[`i${index+1}`]
-        it.time = q[`t${index+1}`] || 0
+        it.time = parseInt(q[`t${index+1}`]) || 0
       })
       this.state = 'player'
       this.$nextTick(() => {
