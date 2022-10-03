@@ -11,6 +11,7 @@
 <body>
 <div id="app">
 </div>
+
 <script id="app-template" type="text/x-template">
   <v-app>
     <v-container fluid>
@@ -19,121 +20,140 @@
           <v-icon>mdi-chevron-right</v-icon>
         </template>
       </v-breadcrumbs>
-      <div :class="`d-flex justify-center ${isMobile ? 'flex-column' : 'flex-row'}`">
-        <v-card outlined :width="vidWidth + 2" class="ma-2">
-          <div class="vid" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
-            <div class="vid-inner" v-show="first.service=='twitch'" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
-              <div id="first-twitch" :style="`width:${vidWidth}px; height:${vidHeight}px;`"></div>
-            </div>
-            <div class="vid-inner" v-show="first.service=='youtube'">
-              <div id="first-youtube"></div>
-            </div>
-          </div>
-          <v-text-field v-if="isMobile" outlined label="Video Id" type="text" v-model="first.id" hide-details="auto" dense @change="updateId('first')" class="mx-2 mt-2"/>
-          <div class="d-flex align-center">
-            <v-btn-toggle class="ma-2" v-model="first.service" @change="updateService('first')" dense>
-              <v-btn outlined value="twitch" height="40">
-                <v-icon>mdi-twitch</v-icon>
-              </v-btn>
-              <v-btn outlined value="youtube" height="40">
-                <v-icon>mdi-youtube</v-icon>
-              </v-btn>
-            </v-btn-toggle>
-            <v-text-field v-if="!isMobile" outlined label="Video Id" type="text" v-model="first.id" hide-details="auto" dense @change="updateId('first')" class="mr-2"/>
-            <v-text-field outlined label="Delay (seconds)" type="number" v-model="first.time" hide-details="auto" dense class="mr-2"/>
-            <v-btn outlined @click="setDelay('first')" class="mr-2 px-0" height="40">
-              <div v-if="isMobile">
-                Set<br/>Delay
-              </div>
-              <div v-else class="mx-2">
-                Set Delay to<br/>Current Time
-              </div>
+
+      <div v-if="state == 'config'">
+        <v-card outlined class="my-4 mx-auto" max-width="500">
+          <v-card-text>
+            Provide two video URLs (twitch or youtube) to play them together in sync.
+          </v-card-text>
+          <v-text-field
+            v-model="first.url"
+            class="mx-2 mt-2"
+            outlined
+            hide-details="auto"
+            :placeholder="first.placeholder"
+            :error="first.error"
+            @keyup="processUrl(first)"
+          ></v-text-field>
+          <v-text-field
+            v-model="second.url"
+            class="mx-2 mt-2"
+            outlined
+            hide-details="auto"
+            :placeholder="second.placeholder"
+            :error="second.error"
+            @keyup="processUrl(second)"
+          ></v-text-field>
+          <v-card-actions>
+            <v-btn
+              block
+              color="primary"
+              :href="url"
+              :disabled="!valid"
+            >
+              Play!
             </v-btn>
-          </div>
-        </v-card>
-        <v-card outlined :width="vidWidth + 2" class="ma-2">
-          <div class="vid" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
-            <div class="vid-inner" v-show="second.service=='twitch'" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
-              <div id="second-twitch" :style="`width:${vidWidth}px; height:${vidHeight}px;`"></div>
-            </div>
-            <div class="vid-inner" v-show="second.service=='youtube'">
-              <div id="second-youtube"></div>
-            </div>
-          </div>
-          <v-text-field v-if="isMobile" outlined label="Video Id" type="text" v-model="second.id" hide-details="auto" dense @change="updateId('second')" class="mx-2 mt-2"/>
-          <div class="d-flex align-center">
-            <v-btn-toggle class="ma-2" v-model="second.service" @change="updateService('second')" dense>
-              <v-btn outlined value="twitch" height="40">
-                <v-icon>mdi-twitch</v-icon>
-              </v-btn>
-              <v-btn outlined value="youtube" height="40">
-                <v-icon>mdi-youtube</v-icon>
-              </v-btn>
-            </v-btn-toggle>
-            <v-text-field v-if="!isMobile" outlined label="Video Id" type="text" v-model="second.id" hide-details="auto" dense @change="updateId('second')" class="mr-2"/>
-            <v-text-field outlined label="Delay (seconds)" type="number" v-model="second.time" hide-details="auto" dense class="mr-2"/>
-            <v-btn outlined @click="setDelay('second')" class="mr-2 px-0" height="40">
-              <div v-if="isMobile">
-                Set<br/>Delay
-              </div>
-              <div v-else class="mx-2">
-                Set Delay to<br/>Current Time
-              </div>
-            </v-btn>
-          </div>
+          </v-card-actions>
         </v-card>
       </div>
-      <v-card flat>
-        <v-card-actions class="d-flex flex-column">
-          <div class="d-flex justify-center">
-            <v-btn outlined large @click="reset" class="ma-2" height="70px" width="70px">
-              <div class="d-flex flex-column"><v-icon>mdi-skip-previous</v-icon><span>restart</span></div>
-            </v-btn>
-            <v-btn outlined large @click="play" class="ma-2" height="70px" width="70px">
-              <div class="d-flex flex-column"><v-icon>mdi-play</v-icon><span>play</span></div>
-            </v-btn>
-            <v-btn outlined large @click="pause" class="ma-2" height="70px" width="70px">
-              <div class="d-flex flex-column"><v-icon>mdi-pause</v-icon><span>pause</span></div>
-            </v-btn>
-          </div>
-          <div class="d-flex justify-center">
-            <v-btn outlined large @click="step(-60)" class="ma-2" height="70px" width="70px">
-              <div class="d-flex flex-column"><v-icon>mdi-step-backward-2</v-icon><span>back</span><span>(1m)</span></div>
-            </v-btn>
-            <v-btn outlined large @click="step(-10)" class="ma-2" height="70px" width="70px">
-              <div class="d-flex flex-column"><v-icon>mdi-step-backward</v-icon><span>back</span><span>(10s)</span></div>
-            </v-btn>
-            <v-btn outlined large @click="step(10)" class="ma-2" height="70px" width="70px">
-              <div class="d-flex flex-column"><v-icon>mdi-step-forward</v-icon><span>skip</span><span>(10s)</span></div>
-            </v-btn>
-            <v-btn outlined large @click="step(60)" class="ma-2" height="70px" width="70px">
-              <div class="d-flex flex-column"><v-icon>mdi-step-forward-2</v-icon><span>skip</span><span>(1m)</span></div>
-            </v-btn>
-          </div>
-          <div class="d-flex justify-center align-center">
-            <v-text-field hide-details readonly :value="shareUrl" @focus="$event.target.select()" ref="share">
-              <template v-slot:prepend-inner>
-                <v-btn dark @click="copyShareUrl" class="my-auto">Copy URL to Share</v-btn>
-              </template>
-            </v-text-field>
-          </div>
-        </v-card-actions>
-      </v-card>
-      <v-card outlined class="my-4 mx-auto" max-width="400">
+
+      <div :class="{'d-none': state != 'player'}">
+        <div id="players" :class="`d-flex justify-center ${isMobile ? 'flex-column' : 'flex-row'}`">
+          <v-card outlined :width="vidWidth + 2" class="ma-2">
+            <div class="vid mb-2" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
+              <div class="vid-inner" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
+                <div id="first-player" :style="`width:${vidWidth}px; height:${vidHeight}px;`"></div>
+              </div>
+            </div>
+            <div class="d-flex align-center mb-2">
+              <v-btn outlined @click="first.setDelay()" class="mx-2 px-0" height="40">
+                <div v-if="isMobile">
+                  Set<br/>Delay
+                </div>
+                <div v-else class="mx-2">
+                  Set Delay to<br/>Current Time
+                </div>
+              </v-btn>
+              <v-text-field outlined label="Delay (seconds)" :value="first.time.toFixed(2)" class="mono" hide-details="auto" dense readonly/>
+              <v-text-field outlined label="Elapsed (seconds)" :value="(first.currentTimeEst-first.time).toFixed(2)" class="mx-2 mono" hide-details="auto" dense readonly/>
+            </div>
+          </v-card>
+          <v-card outlined :width="vidWidth + 2" class="ma-2">
+            <div class="vid mb-2" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
+              <div class="vid-inner" :style="`width:${vidWidth}px; height:${vidHeight}px;`">
+                <div id="second-player" :style="`width:${vidWidth}px; height:${vidHeight}px;`"></div>
+              </div>
+            </div>
+            <div class="d-flex align-center mb-2">
+              <v-btn outlined @click="second.setDelay()" class="mx-2 px-0" height="40">
+                <div v-if="isMobile">
+                  Set<br/>Delay
+                </div>
+                <div v-else class="mx-2">
+                  Set Delay to<br/>Current Time
+                </div>
+              </v-btn>
+              <v-text-field outlined label="Delay (seconds)" :value="second.time.toFixed(2)" class="mono" hide-details="auto" dense readonly/>
+              <v-text-field outlined label="Elapsed (seconds)" :value="(second.currentTimeEst-second.time).toFixed(2)" class="mx-2 mono" hide-details="auto" dense readonly/>
+            </div>
+          </v-card>
+        </div>
+        <v-card id="controls" flat>
+          <v-card-actions class="d-flex flex-column">
+            <v-text-field outlined label="Elapsed Diff (seconds)" :value="Math.abs(first.currentTimeEst - first.time - second.currentTimeEst + second.time).toFixed(2)" class="mb-2 mono" hide-details="auto" dense readonly/>
+            <div class="d-flex justify-center">
+              <v-btn outlined large @click="reset" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-skip-previous</v-icon><span>restart</span></div>
+              </v-btn>
+              <v-btn dark large @click="play" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-play</v-icon><span>play</span></div>
+              </v-btn>
+              <v-btn dark large @click="pause" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-pause</v-icon><span>pause</span></div>
+              </v-btn>
+              <v-btn outlined large @click="resync" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-refresh</v-icon><span>resync</span></div>
+              </v-btn>
+            </div>
+            <div class="d-flex justify-center">
+              <v-btn outlined large @click="step(-60)" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-step-backward-2</v-icon><span>back</span><span>(1m)</span></div>
+              </v-btn>
+              <v-btn outlined large @click="step(-10)" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-step-backward</v-icon><span>back</span><span>(10s)</span></div>
+              </v-btn>
+              <v-btn outlined large @click="step(10)" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-step-forward</v-icon><span>skip</span><span>(10s)</span></div>
+              </v-btn>
+              <v-btn outlined large @click="step(60)" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-step-forward-2</v-icon><span>skip</span><span>(1m)</span></div>
+              </v-btn>
+            </div>
+          </v-card-actions>
+        </v-card>
+      </div>
+
+      <div class="d-flex justify-center align-center" v-if="state == 'player'">
+        <v-text-field style="max-width:500px" hide-details readonly :value="url" @focus="$event.target.select()" ref="share">
+          <template v-slot:prepend-inner>
+            <v-btn small dark @click="copyShareUrl" class="mb-1">Copy URL to Share</v-btn>
+          </template>
+        </v-text-field>
+      </div>
+
+      <v-card id="tips" outlined class="my-4 mx-auto" max-width="500">
         <v-card-text>
+          <p v-if="state!='player'">I made this for comparing speedrun videos, but maybe its useful otherwise? This tool lets you playback videos in sync from an arbitrary reference point, and it also is pretty good for comparing segment lengths. If you want to see it in action but can't be bothered to pick out some videos, <a href="https://vod-sync.3and3.dev?s1=t&1i=1461721066&s2=y&i2=nMZfKXk8geo&t2=25">here's a sample</a>.</p>
+          <p v-if="state!='player'">Some tips:</p>
           <ul>
             <li>Some videos take a while to get started on first play. Just start playback and then hit <strong>RESTART</strong> to get it synced.</li>
-            <li>Sometimes skipping will desync your videos. To avoid, pause before skipping and play again after both videos are ready. I could probably do this automatically with a little more effort but I haven't yet.</li>
             <li>Try seeking through videos individually and using <strong>SET DELAY<span v-if="!isMobile"> TO CURRENT TIME</span></strong>, and then <strong>RESTART</strong> to play in sync from there.</li>
+            <li><strong>RESYNC</strong> is like <strong>RESTART</strong>, but it  tries to maintain your current position through the videos.</li>
+            <li>To compare segment lengths, <strong>SET DELAY</strong> at the start of each segment and pause the video at the end of the segment. The <strong>Elapsed</strong> time on each video will tell you the length of the segment and <strong>Elapsed Diff</strong> will give you the difference.</li>
+            <li>When you're in the player mode you can hit <strong>vod sync</strong> in the breadcrumbs up top to get back to the video selection screen, but in case that isnt obvious <a :href=baseUrl>here's another link to it</a>.</li>
           </ul>
         </v-card-text>
       </v-card>
-      <div class="d-flex justify-center">
-        <v-icon>mdi-email</v-icon>
-        <span>alnordst</span>
-        <v-icon>mdi-at</v-icon>
-        <span>hey.com</span>
-      </div>
     </v-container>
   </v-app>
 </script>
