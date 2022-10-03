@@ -21,8 +21,6 @@ const App = {
       id: undefined,
       time: 0,
       error: false,
-      misc: undefined,
-      player: undefined,
       play: () => {},
       pause: () => {},
       getCurrentTime: () => 0,
@@ -38,8 +36,6 @@ const App = {
       id: undefined,
       time: 0,
       error: false,
-      misc: undefined,
-      player: undefined,
       play: () => {},
       pause: () => {},
       getCurrentTime: () => 0,
@@ -187,7 +183,7 @@ const App = {
       this.$nextTick(() => {
         this.both.forEach(it => {
           if(it.service == 'twitch') {
-            it.misc = new Twitch.Player(it.el, {
+            let twitch = new Twitch.Player(it.el, {
               video: it.id,
               time: it.time,
               parent: [this.domain, 'localhost'],
@@ -195,18 +191,23 @@ const App = {
               height: '100%',
               autoplay: false
             })
-            it.misc.addEventListener(Twitch.Embed.VIDEO_READY, () => {
-              it.player = it.misc.getPlayer()
-              it.play = () => {it.player.play()}
-              it.pause = () => {it.player.pause()}
-              it.getCurrentTime = () => it.player.getCurrentTime()
-              it.seek = (time) => {it.player.seek(this.parseFloat(time))}
+            twitch.addEventListener(Twitch.Embed.VIDEO_READY, () => {
+              let player = twitch.getPlayer()
+              it.play = () => {player.play()}
+              it.pause = () => {player.pause()}
+              it.getCurrentTime = () => player.getCurrentTime()
+              it.seek = (time) => {player.seek(this.parseFloat(time))}
               it.setDelay = () => {it.time = this.parseFloat(it.getCurrentTime())}
-              setInterval(() => {it.currentTimeEst = it.getCurrentTime()}, 100)
+              setInterval(() => {
+                try {
+                  it.currentTimeEst = it.getCurrentTime()
+              } catch (err) {
+                //nothing
+              }}, 100)
             })
           } else if(it.service == 'youtube') {
             this.waitLoop(1000, () => youtubeReady, () => {
-              it.player = new YT.Player(it.el, {
+              let player = new YT.Player(it.el, {
                 videoId: it.id,
                 playerVars: {
                   playsinline: 1,
@@ -215,10 +216,10 @@ const App = {
                 width: this.vidWidth,
                 height: this.vidHeight
               })
-              it.play = () => {it.player.playVideo()}
-              it.pause = () => {it.player.pauseVideo()}
-              it.getCurrentTime = () => it.player.getCurrentTime()
-              it.seek = (time) => {it.player.seekTo(this.parseFloat(time), true)}
+              it.play = () => {player.playVideo()}
+              it.pause = () => {player.pauseVideo()}
+              it.getCurrentTime = () => player.getCurrentTime()
+              it.seek = (time) => {player.seekTo(this.parseFloat(time), true)}
               it.setDelay = () => {it.time = this.parseFloat(it.getCurrentTime())}
               setInterval(() => {
                 try {
