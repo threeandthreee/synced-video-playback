@@ -198,12 +198,6 @@ const App = {
               it.getCurrentTime = () => player.getCurrentTime()
               it.seek = (time) => {player.seek(this.parseFloat(time))}
               it.setDelay = () => {it.time = this.parseFloat(it.getCurrentTime())}
-              setInterval(() => {
-                try {
-                  it.currentTimeEst = it.getCurrentTime()
-              } catch (err) {
-                //nothing
-              }}, 100)
             })
           } else if(it.service == 'youtube') {
             this.waitLoop(1000, () => youtubeReady, () => {
@@ -221,15 +215,15 @@ const App = {
               it.getCurrentTime = () => player.getCurrentTime()
               it.seek = (time) => {player.seekTo(this.parseFloat(time), true)}
               it.setDelay = () => {it.time = this.parseFloat(it.getCurrentTime())}
-              setInterval(() => {
-                try {
-                  it.currentTimeEst = it.getCurrentTime()
-                } catch (err) {
-                  //nothing
-                }
-              }, 100)
             })
           }
+          setInterval(() => {
+            try {
+              this.both.forEach(it => {
+                it.currentTimeEst = it.getCurrentTime()
+              })
+            } catch (err) {}
+          }, 1000)
         })
       })
     } else {
