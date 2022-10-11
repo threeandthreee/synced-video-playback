@@ -87,9 +87,9 @@ const App = {
       return this.baseUrl + '?' + params.join('&')
     },
     elapsedDiff() {
-      let ests = this.players.map(it => it.currentTimeEst)
-      ests.sort()
-      return Math.abs(ests[0] - ests[ests.length-1])
+      let elapsedTimes = this.players.map(it => it.currentTimeEst - it.time)
+      elapsedTimes.sort()
+      return this.parseFloat(elapsedTimes[0] - elapsedTimes[elapsedTimes.length-1])
     }
   },
   methods: {
@@ -125,14 +125,8 @@ const App = {
       this.players.forEach(it => it.seek(it.time))
     },
     resync() {
-      /*
-      let firstDiff = this.first.currentTimeEst - this.first.time
-      let secondDiff = this.second.currentTimeEst - this.second.time
-      if(firstDiff < secondDiff)
-        this.second.seek(this.second.time + firstDiff)
-      else
-        this.first.seek(this.first.time + secondDiff)
-      */
+      let targetElapsed = this.players[0].getCurrentTime() - this.players[0].time
+      this.players.forEach(it => it.seek(it.time + targetElapsed))
     },
     step(seconds) {
       this.players.forEach(it => {it.seek(it.getCurrentTime() + seconds)})

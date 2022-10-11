@@ -77,7 +77,7 @@
         </div>
         <v-card id="controls" flat>
           <v-card-actions class="d-flex flex-column">
-
+            <v-text-field outlined label="Elapsed Diff (seconds)" :value="elapsedDiff" class="my-2 mono" hide-details="auto" dense readonly/>
             <div class="d-flex justify-center">
               <v-btn outlined large @click="reset" class="ma-2" height="70px" width="70px">
                 <div class="d-flex flex-column"><v-icon>mdi-skip-previous</v-icon><span>restart</span></div>
@@ -111,7 +111,7 @@
       </div>
 
       <div class="d-flex justify-center align-center" v-if="state == 'player'">
-        <v-text-field style="max-width:500px" hide-details readonly :value="url" @focus="$event.target.select()" ref="share">
+        <v-text-field style="max-width:500px" hide-details readonly :value="url" @focus="$event.target.select()" ref="share" class="pt-0 mt-0">
           <template v-slot:prepend-inner>
             <v-btn small dark @click="copyShareUrl" class="mb-1">Copy URL to Share</v-btn>
           </template>
@@ -125,7 +125,7 @@
           <ul>
             <li>Some videos take a while to get started on first play. Just start playback and then hit <strong>RESTART</strong> to get it synced.</li>
             <li>Try seeking through videos individually and using <strong>SET DELAY<span v-if="!isMobile"> TO CURRENT TIME</span></strong>, and then <strong>RESTART</strong> to play in sync from there.</li>
-            <li><strong>RESYNC</strong> is like <strong>RESTART</strong>, but it  tries to maintain your current position through the videos.</li>
+            <li><strong>RESYNC</strong> is like <strong>RESTART</strong>, but it  tries to maintain your current position through the videos by syncing to the elapsed time of the first video.</li>
             <li>To compare segment lengths, <strong>SET DELAY</strong> at the start of each segment and pause the video at the end of the segment. The <strong>Elapsed</strong> time on each video will tell you the length of the segment and <strong>Elapsed Diff</strong> will give you the difference.</li>
             <li>When you're in the player mode you can hit <strong>vod sync</strong> in the breadcrumbs up top to get back to the video selection screen, but in case that isnt obvious <a :href=baseUrl>here's another link to it</a>.</li>
           </ul>
