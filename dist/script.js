@@ -13,36 +13,11 @@ const App = {
   data: () => ({
     domain: 'vod-sync.3and3.dev',
     state: 'loading', // loading | config | player
-    first: {
-      el: 'first-player',
-      placeholder: "https://www.twitch.tv/videos/1461721066?t=0h0m1s",
-      url: undefined,
-      service: undefined,
-      id: undefined,
-      time: 0,
-      error: false,
-      play: () => {},
-      pause: () => {},
-      getCurrentTime: () => 0,
-      seek: () => {},
-      setDelay: () => {},
-      currentTimeEst: 0
-    },
-    second: {
-      el: 'second-player',
-      placeholder: "https://youtube.com/watch?v=nMZfKXk8geo&t=27",
-      url: undefined,
-      service: undefined,
-      id: undefined,
-      time: 0,
-      error: false,
-      play: () => {},
-      pause: () => {},
-      getCurrentTime: () => 0,
-      seek: () => {},
-      setDelay: () => {},
-      currentTimeEst: 0
-    },
+    urls: [
+      { text: '' },
+      { text: '' }
+    ],
+    players: []
   }),
   computed: {
     baseUrl () {
@@ -64,6 +39,14 @@ const App = {
     isMobile() {
       return this.$vuetify.breakpoint.smAndDown
     },
+    colSize() {
+      if(this.isMobile || this.players.length == 1)
+        return 12
+      else if(this.players.length <= 4)
+        return 6
+      else
+        return 4
+    },
     vidWidth() {
       if(this.isMobile) {
         const PADDING = (8+1) * 4 + 12 * 2
@@ -79,62 +62,51 @@ const App = {
       const RATIO = 9 / 16
       return this.vidWidth * RATIO
     },
-    both() {
-      return [this.first, this.second]
-    },
-    valid() {
-      return this.first.service &&
-        this.first.id &&
-        this.second.service &&
-        this.second.id
-    },
     url() {
-      if(this.valid)
-        return this.baseUrl + '?' + [
-          [this.first.service && this.first.service.charAt(0), 's1'],
-          [this.first.id, 'i1'],
-          [this.first.time, 't1'],
-          [this.second.service && this.second.service.charAt(0), 's2'],
-          [this.second.id, 'i2'],
-          [this.second.time, 't2']
-        ].filter(([val, key]) => val)
-          .map(([val, key]) => `${key}=${val}`)
-          .join('&')
-      else
-        return this.baseUrl
+      let params = []
+      if(this.players.length) {
+        this.players.forEach((it, i) => {
+          params.push(`s${i+1}=${it.service}`)
+          params.push(`i${i+1}=${it.id}`)
+          if(it.time)
+            params.push(`t${i+1}=${it.time}`)
+        })
+      } else {
+        this.urls.map(it => it.text).filter(it => it).forEach((it, i) => {
+          let twitch = it.match(/twitch.*?\/(\d{10})/i)
+          let youtube = it.match(/youtu.*?[\/=]([\w-]{11})/i)
+          if(twitch) {
+            params.push(`s${i+1}=t`)
+            params.push(`i${i+1}=${twitch[1]}`)
+          } else if(youtube) {
+            params.push(`s${i+1}=y`)
+            params.push(`i${i+1}=${youtube[1]}`)
+          }
+        })
+      }
+      return this.baseUrl + '?' + params.join('&')
     },
     elapsedDiff() {
-      return Math.abs(this.first.currentTimeEst - this.second.currentTimeEst)
+      let ests = this.players.map(it => it.currentTimeEst)
+      ests.sort()
+      return Math.abs(ests[0] - ests[ests.length-1])
     }
   },
   methods: {
     parseFloat(float) {
       return Math.round(parseFloat(float) * 100) / 100
     },
-    processUrl(it) {
-      it.error = false
-      it.service = undefined
-      it.id = undefined
-      it.time = 0
-      if(!it.url)
-        it.url = it.placeholder
-      let twitchMatch = it.url.match(/twitch\.tv.*?(\d+)/)
-      let youtubeMatch = it.url.match(/youtu\.*?be.*?(\w{11})/)
-      if(twitchMatch) {
-        it.service = 'twitch'
-        it.id = twitchMatch[1]
-        let tMatch = it.url.match(/\?t=(\d+)h(\d+)m(\d+)s/)
-        if(tMatch)
-          it.time = parseInt(tMatch[1]) * 3600 + parseInt(tMatch[2]) * 60 + parseInt(tMatch[3])
-      } else if(youtubeMatch) {
-        it.service = 'youtube'
-        it.id = youtubeMatch[1]
-        let tMatch = it.url.match(/t=(\d+)/)
-        if(tMatch)
-          it.time = parseInt(tMatch[1])
-      } else {
-        console.log('error')
-        it.error = true
+    urlsChangeHandler() {
+      if(this.urls.every(it => it.text) && this.urls.length < 9)
+        this.urls.push({text:''})
+    },
+    urlsClearHandler() {
+      if(this.urls.length > 2) {
+        let blanks = this.urls.filter(it => !it.text).length
+        for(let i=0; i<blanks; i++) {
+          let index = this.urls.findIndex(it => !it.text)
+          this.urls.splice(index, 1)
+        }
       }
     },
     waitLoop(delay, condition, callback) {
@@ -144,46 +116,62 @@ const App = {
         setTimeout(() => {this.waitLoop(delay, condition, callback)}, delay)
     },
     play() {
-      this.both.forEach(it => it.play())
+      this.players.forEach(it => it.play())
     },
     pause() {
-      this.both.forEach(it => it.pause())
+      this.players.forEach(it => it.pause())
     },
     reset() {
-      this.both.forEach(it => it.seek(it.time))
+      this.players.forEach(it => it.seek(it.time))
     },
     resync() {
+      /*
       let firstDiff = this.first.currentTimeEst - this.first.time
       let secondDiff = this.second.currentTimeEst - this.second.time
       if(firstDiff < secondDiff)
         this.second.seek(this.second.time + firstDiff)
       else
         this.first.seek(this.first.time + secondDiff)
+      */
     },
     step(seconds) {
-      this.both.forEach(it => {it.seek(it.getCurrentTime() + seconds)})
+      this.players.forEach(it => {it.seek(it.getCurrentTime() + seconds)})
     },
     copyShareUrl(){
       this.$refs.share.focus()
       document.execCommand('copy')
     }
   },
-  mounted () {
-    let q = this.$route.query
-    let valid = ['s1', 's2', 'i1', 'i2'].every(it => it in q)
+  async mounted () {
+    let q = await this.$route.query
+    console.log('q', q)
+    let players = []
+    ;[1,2,3,4,5,6,7,8,9].forEach(n => {
+      if((`s${n}` in q) && (`i${n}` in q)) {
+        players.push({
+          service: q[`s${n}`],
+          id: q[`i${n}`],
+          time: `t${n}` in q ? this.parseFloat(q[`t${n}`]) : 0,
+          play: () => {},
+          pause: () => {},
+          getCurrentTime: () => 0,
+          seek: () => {},
+          setDelay: () => {},
+          currentTimeEst: 0
+        })
+      }
+    })
 
-    if(valid) {
-      let services = { t: 'twitch', y: 'youtube' }
-      this.both.forEach((it, index) => {
-        it.service = services[q[`s${index+1}`]]
-        it.id = q[`i${index+1}`]
-        it.time = parseInt(q[`t${index+1}`]) || 0
-      })
+    this.players = players
+
+    if(players.length) {
       this.state = 'player'
       this.$nextTick(() => {
-        this.both.forEach(it => {
-          if(it.service == 'twitch') {
-            let twitch = new Twitch.Player(it.el, {
+        players.forEach((it, i) => {
+          let elId = `player${i+1}`
+          console.log('setting up player', it, it.service, it.id, elId)
+          if(it.service == 't') {
+            let twitch = new Twitch.Player(elId, {
               video: it.id,
               time: it.time,
               parent: [this.domain, 'localhost'],
@@ -199,9 +187,9 @@ const App = {
               it.seek = (time) => {player.seek(this.parseFloat(time))}
               it.setDelay = () => {it.time = this.parseFloat(it.getCurrentTime())}
             })
-          } else if(it.service == 'youtube') {
+          } else if(it.service == 'y') {
             this.waitLoop(1000, () => youtubeReady, () => {
-              let player = new YT.Player(it.el, {
+              let player = new YT.Player(elId, {
                 videoId: it.id,
                 playerVars: {
                   playsinline: 1,
@@ -219,7 +207,7 @@ const App = {
           }
           setInterval(() => {
             try {
-              this.both.forEach(it => {
+              this.players.forEach(it => {
                 it.currentTimeEst = it.getCurrentTime()
               })
             } catch (err) {}
@@ -232,7 +220,7 @@ const App = {
   },
   watch: {
     vidWidth() {
-      this.both
+      this.players
         .filter(it => it.service == 'youtube')
         .forEach(it => {
           //it.player.setSize(this.vidWidth, this.vidHeight)
@@ -240,13 +228,6 @@ const App = {
           el.style.width = `${this.vidWidth}px`
           el.style.height = `${this.vidHeight}px`
         })
-    },
-    $route() {
-      let q = this.$route.query
-      if('t1' in q)
-        this.first.time = q.t1
-      if('t2' in q)
-        this.second.time = q.t2
     }
   }
 }
