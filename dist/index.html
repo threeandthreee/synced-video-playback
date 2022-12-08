@@ -93,17 +93,17 @@
               </v-btn>
             </div>
             <div class="d-flex justify-center">
-              <v-btn outlined large @click="step(-60)" class="ma-2" height="70px" width="70px">
-                <div class="d-flex flex-column"><v-icon>mdi-step-backward-2</v-icon><span>back</span><span>(1m)</span></div>
-              </v-btn>
               <v-btn outlined large @click="step(-10)" class="ma-2" height="70px" width="70px">
-                <div class="d-flex flex-column"><v-icon>mdi-step-backward</v-icon><span>back</span><span>(10s)</span></div>
+                <div class="d-flex flex-column"><v-icon>mdi-step-backward-2</v-icon><span>back</span><span>(10s)</span></div>
+              </v-btn>
+              <v-btn outlined large @click="step(-1)" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-step-backward</v-icon><span>back</span><span>(1s)</span></div>
+              </v-btn>
+              <v-btn outlined large @click="step(1)" class="ma-2" height="70px" width="70px">
+                <div class="d-flex flex-column"><v-icon>mdi-step-forward</v-icon><span>skip</span><span>(1s)</span></div>
               </v-btn>
               <v-btn outlined large @click="step(10)" class="ma-2" height="70px" width="70px">
-                <div class="d-flex flex-column"><v-icon>mdi-step-forward</v-icon><span>skip</span><span>(10s)</span></div>
-              </v-btn>
-              <v-btn outlined large @click="step(60)" class="ma-2" height="70px" width="70px">
-                <div class="d-flex flex-column"><v-icon>mdi-step-forward-2</v-icon><span>skip</span><span>(1m)</span></div>
+                <div class="d-flex flex-column"><v-icon>mdi-step-forward-2</v-icon><span>skip</span><span>(10s)</span></div>
               </v-btn>
             </div>
           </v-card-actions>
