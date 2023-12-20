@@ -17,7 +17,8 @@ const App = {
       { text: '' },
       { text: '' }
     ],
-    players: []
+    players: [],
+    autosync: false
   }),
   computed: {
     baseUrl () {
@@ -136,6 +137,10 @@ const App = {
       document.execCommand('copy')
     }
   },
+  created() {
+    if(window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches)
+      this.$vuetify.theme.dark = true
+  },
   async mounted () {
     let q = await this.$route.query
     console.log('q', q)
@@ -222,6 +227,10 @@ const App = {
           el.style.width = `${this.vidWidth}px`
           el.style.height = `${this.vidHeight}px`
         })
+    },
+    elapsedDiff(diff) {
+      if(this.autosync && Math.abs(diff) >= 1)
+        this.resync()
     }
   }
 }
