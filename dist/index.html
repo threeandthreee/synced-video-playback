@@ -15,11 +15,15 @@
 <script id="app-template" type="text/x-template">
   <v-app>
     <v-container fluid>
-      <v-breadcrumbs :items="breadcrumbs">
-        <template v-slot:divider>
-          <v-icon>mdi-chevron-right</v-icon>
-        </template>
-      </v-breadcrumbs>
+      <div class="d-flex align-center">
+        <v-breadcrumbs :items="breadcrumbs">
+          <template v-slot:divider>
+            <v-icon>mdi-chevron-right</v-icon>
+          </template>
+        </v-breadcrumbs>
+        <v-spacer/>
+        <v-switch v-model="$vuetify.theme.dark" label="Dark" dense/>
+      </div>
 
       <div v-if="state == 'config'">
         <v-card outlined class="my-4 mx-auto" max-width="500">
