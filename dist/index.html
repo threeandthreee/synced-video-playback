@@ -22,7 +22,11 @@
           </template>
         </v-breadcrumbs>
         <v-spacer/>
-        <v-switch v-model="$vuetify.theme.dark" label="Dark" dense/>
+        <v-switch v-model="$vuetify.theme.dark" dense>
+          <template v-slot:label>
+            <v-icon>mdi-theme-light-dark</v-icon>
+          </template>
+        </v-switch>
       </div>
 
       <div v-if="state == 'config'">
